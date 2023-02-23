@@ -1,4 +1,6 @@
 import sys
+
+import requests as requests
 from PySide6.QtCore import QUrl, QTimer
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication, QHBoxLayout, QLabel, QMainWindow, QPushButton, QVBoxLayout, QWidget, \
@@ -9,6 +11,10 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        res = requests.get("https://connectkaraoke.com/showlogin.php?ShowDirect=MZSJFQKL")
+        items = res.url.split("/")
+        self.proxy = f"https://connectkaraoke.com/proxy/{items[-2]}/queue"
 
         self.setWindowTitle("Website and Image Display")
         self.resize(800, 600)
@@ -41,7 +47,7 @@ class MainWindow(QMainWindow):
     def showWebsite(self):
         print("we are showing queue again")
         self.image_label.hide()
-        self.web_view.load(QUrl("https://connectkaraoke.com/proxy/EMWD8764/queue"))
+        self.web_view.load(QUrl(self.proxy))
         self.web_view.show()
         self.timerScroll.start(100)
         self.timer.start(20000)
