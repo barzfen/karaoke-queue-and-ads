@@ -3,7 +3,7 @@ from Promotions import Promotions
 from Queue import Queue
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import QUrl, QTimer
-from PySide6.QtWidgets import QMainWindow, QHBoxLayout
+from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout
 
 
 class MainWindow(QMainWindow):
@@ -34,10 +34,11 @@ class MainWindow(QMainWindow):
         #####################
         # Queue page set up #
         #####################
-        queue_layout = QHBoxLayout()
+        queue_layout = QVBoxLayout()
         queue_layout.setContentsMargins(0, 0, 0, 0)
         self.ui.queue_page.setLayout(queue_layout)
-        self.queue_view = Queue(self.ui.queue_page)
+        self.queue_view = Queue(None)
+        # self.queue_view = Queue(self.ui.queue_page)
         queue_layout.addWidget(self.queue_view)
         #######################
         # Setting Page set up #
@@ -60,14 +61,13 @@ class MainWindow(QMainWindow):
         self.close()
 
     def show_queue(self):
-        print("Show queue Called")
         self.ui.stackedWidget.setCurrentWidget(self.ui.queue_page)
         self.queue_view.start_scroll()
         self.queue_timer.singleShot(5000, self.show_promo)
         self.promo_label.load_next_image()
 
     def show_promo(self):
-        print("Show promo Called")
+        self.queue_view.stop_scrolling()
         self.ui.stackedWidget.setCurrentWidget(self.ui.promo_page)
         self.promo_timer.singleShot(5000, self.show_queue)
         self.queue_view.refresh_site()

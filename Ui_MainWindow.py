@@ -34,6 +34,11 @@ class Ui_MainWindow(object):
         self.stackedWidget.setObjectName(u"stackedWidget")
         self.queue_page = QWidget()
         self.queue_page.setObjectName(u"queue_page")
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.queue_page.sizePolicy().hasHeightForWidth())
+        self.queue_page.setSizePolicy(sizePolicy)
         self.stackedWidget.addWidget(self.queue_page)
         self.promo_page = QWidget()
         self.promo_page.setObjectName(u"promo_page")
@@ -87,7 +92,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(2)
+        self.stackedWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
