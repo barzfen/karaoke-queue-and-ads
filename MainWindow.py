@@ -2,7 +2,7 @@ from Ui_MainWindow import Ui_MainWindow
 from Promotions import Promotions
 from Queue import Queue
 from PySide6.QtGui import QPixmap
-from PySide6.QtCore import QUrl
+from PySide6.QtCore import QUrl, QTimer
 from PySide6.QtWidgets import QMainWindow, QHBoxLayout
 
 
@@ -38,20 +38,17 @@ class MainWindow(QMainWindow):
         queue_layout.setContentsMargins(0, 0, 0, 0)
         self.ui.queue_page.setLayout(queue_layout)
         self.queue_view = Queue(self.ui.queue_page)
-        promo_layout.addWidget(self.queue_view)
+        queue_layout.addWidget(self.queue_view)
         #######################
         # Setting Page set up #
         #######################
 
-        self.ui.stackedWidget.setCurrentWidget(self.ui.queue_page)
+        self.queue_timer = QTimer()
+        self.promo_timer = QTimer()
+        self.queue_timer.timeout.connect(self.show_promo)
+        self.promo_timer.timeout.connect(self.show_queue)
 
-        # self.timer = QTimer()
-        # self.timerScroll = QTimer()
-        # self.timer.timeout.connect(self.onTimeout)
-        # self.timerScroll.timeout.connect(self.scroll_page)
-        #
-        # self.show_website()
-        # self.timerScroll.start(100)
+        self.show_queue()
 
     def set_fullscreen(self):
         print("Set full screen goes here")
@@ -62,28 +59,15 @@ class MainWindow(QMainWindow):
     def end_program(self):
         self.close()
 
-    def show_website(self):
-        print("we are showing queue again")
-        self.image_label.hide()
-        self.web_view.load(QUrl(self.proxy))
-        self.web_view.show()
-        self.timerScroll.start(100)
-        self.timer.start(20000)
+    def show_queue(self):
+        print("Show queue Called")
+        self.ui.stackedWidget.setCurrentWidget(self.ui.queue_page)
+        self.queue_view.start_scroll()
+        self.queue_timer.singleShot(5000, self.show_promo)
+        self.promo_label.load_next_image()
 
-    def showImage(self):
-        print("we are now showing image")
-        self.web_view.hide()
-        # swap out meton.jpg with your advertising image
-        self.image_label.setPixmap(QPixmap("Images/meton2.jpg"))
-        self.image_label.show()
-        self.timer.start(10000)
-
-    def onTimeout(self):
-        if self.web_view.isVisible():
-            self.showImage()
-        else:
-            self.showWebsite()
-
-    def scroll_page(self):
-
-        self.web_view.page().runJavaScript("window.scrollBy(0,1);")
+    def show_promo(self):
+        print("Show promo Called")
+        self.ui.stackedWidget.setCurrentWidget(self.ui.promo_page)
+        self.promo_timer.singleShot(5000, self.show_queue)
+        self.queue_view.refresh_site()
