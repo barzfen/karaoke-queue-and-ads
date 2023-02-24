@@ -1,8 +1,7 @@
 from Ui_MainWindow import Ui_MainWindow
 from Promotions import Promotions
 from Queue import Queue
-from PySide6.QtGui import QPixmap
-from PySide6.QtCore import QUrl, QTimer
+from PySide6.QtCore import QTimer, Qt
 from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout
 
 
@@ -51,8 +50,21 @@ class MainWindow(QMainWindow):
 
         self.show_queue()
 
+    def keyPressEvent(self, event):
+        key = event.key()
+        if key == Qt.Key_Escape:
+            self.windowHandle().showNormal()
+            self.ui.full_screen_btn.show()
+            self.ui.settings_btn.show()
+            self.ui.close_btn.show()
+
+        super().keyPressEvent(event)
+
     def set_fullscreen(self):
-        print("Set full screen goes here")
+        self.windowHandle().showFullScreen()
+        self.ui.full_screen_btn.hide()
+        self.ui.settings_btn.hide()
+        self.ui.close_btn.hide()
 
     def show_settings(self):
         print("Setting goes here")
