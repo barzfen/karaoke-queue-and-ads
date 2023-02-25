@@ -43,9 +43,6 @@ class Ui_MainWindow(object):
         self.promo_page = QWidget()
         self.promo_page.setObjectName(u"promo_page")
         self.stackedWidget.addWidget(self.promo_page)
-        self.setting_page = QWidget()
-        self.setting_page.setObjectName(u"setting_page")
-        self.stackedWidget.addWidget(self.setting_page)
 
         self.verticalLayout.addWidget(self.stackedWidget)
 
@@ -92,7 +89,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)

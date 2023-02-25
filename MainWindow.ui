@@ -20,7 +20,7 @@
       <item>
        <widget class="QStackedWidget" name="stackedWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="queue_page">
          <property name="sizePolicy">
@@ -31,7 +31,6 @@
          </property>
         </widget>
         <widget class="QWidget" name="promo_page"/>
-        <widget class="QWidget" name="setting_page"/>
        </widget>
       </item>
       <item>

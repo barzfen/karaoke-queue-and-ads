@@ -1,8 +1,10 @@
-from Ui_MainWindow import Ui_MainWindow
-from Promotions import Promotions
-from Queue import Queue
 from PySide6.QtCore import QTimer, Qt
+from Ui_MainWindow import Ui_MainWindow
 from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout
+
+from Queue import Queue
+from Promotions import Promotions
+from SettingsPage import SettingsPage
 
 
 class MainWindow(QMainWindow):
@@ -14,13 +16,14 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Queue and Image Display")
 
-        self.ui.full_screen_btn.clicked.connect(self.set_fullscreen)
-        self.ui.settings_btn.clicked.connect(self.show_settings)
-        self.ui.close_btn.clicked.connect(self.close)
-
         ######################################
         # Set up and add the Stacked Widgets #
         ######################################
+        #######################
+        # Setting Page set up #
+        #######################
+        self.settings_page = SettingsPage(self.ui.stackedWidget)
+        self.ui.stackedWidget.addWidget(self.settings_page)
         ######################
         # Promo Widget setup #
         ######################
@@ -39,14 +42,22 @@ class MainWindow(QMainWindow):
         self.queue_view = Queue(None)
         # self.queue_view = Queue(self.ui.queue_page)
         queue_layout.addWidget(self.queue_view)
-        #######################
-        # Setting Page set up #
-        #######################
 
         self.queue_timer = QTimer()
+        self.queue_timer.setSingleShot(True)
         self.promo_timer = QTimer()
+        self.queue_timer.setSingleShot(True)
         self.queue_timer.timeout.connect(self.show_promo)
         self.promo_timer.timeout.connect(self.show_queue)
+
+        self.ui.full_screen_btn.clicked.connect(self.set_fullscreen)
+        self.ui.settings_btn.clicked.connect(self.show_settings)
+        self.ui.close_btn.clicked.connect(self.close)
+        self.settings_page.done_signal.connect(self.settings_changed)
+
+        # Flag so that the page doesn't change with timer
+        # when you switch to the settings page
+        self.showing_settings = False
 
         self.show_queue()
 
@@ -67,19 +78,28 @@ class MainWindow(QMainWindow):
         self.ui.close_btn.hide()
 
     def show_settings(self):
-        print("Setting goes here")
+        self.showing_settings = True
+        self.ui.stackedWidget.setCurrentWidget(self.settings_page)
 
     def end_program(self):
         self.close()
 
     def show_queue(self):
-        self.ui.stackedWidget.setCurrentWidget(self.ui.queue_page)
-        self.queue_view.start_scroll()
-        self.queue_timer.singleShot(5000, self.show_promo)
-        self.promo_label.load_next_image()
+        if not self.showing_settings:
+            self.ui.stackedWidget.setCurrentWidget(self.ui.queue_page)
+            self.queue_view.start_scroll()
+            self.queue_timer.singleShot(5000, self.show_promo)
+            self.promo_label.load_next_image()
 
     def show_promo(self):
-        self.queue_view.stop_scrolling()
-        self.ui.stackedWidget.setCurrentWidget(self.ui.promo_page)
-        self.promo_timer.singleShot(5000, self.show_queue)
-        self.queue_view.refresh_site()
+        if not self.showing_settings:
+            self.queue_view.stop_scrolling()
+            self.ui.stackedWidget.setCurrentWidget(self.ui.promo_page)
+            self.promo_timer.singleShot(5000, self.show_queue)
+            self.queue_view.refresh_site()
+
+    def settings_changed(self):
+        self.showing_settings = False
+        # Update of settings goes here
+
+        self.show_queue()
