@@ -22,6 +22,8 @@ class Queue(QWebEngineView):
 
     def refresh_site(self):
         self.load(QUrl(self.proxy))
+        self.page().runJavaScript("window.scrollTo(0, 0);")
+
         self.show()
 
     def start_scroll(self):
