@@ -1,5 +1,5 @@
-from PySide6.QtCore import QTimer, Qt
 from Ui_MainWindow import Ui_MainWindow
+from PySide6.QtCore import QTimer, Qt, QEvent
 from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout
 
 from Queue import Queue
@@ -39,9 +39,11 @@ class MainWindow(QMainWindow):
         queue_layout = QVBoxLayout()
         queue_layout.setContentsMargins(0, 0, 0, 0)
         self.ui.queue_page.setLayout(queue_layout)
-        self.queue_view = Queue(None)
-        # self.queue_view = Queue(self.ui.queue_page)
+        self.queue_view = Queue(self.ui.queue_page)
         queue_layout.addWidget(self.queue_view)
+
+        # Redirect WebView key press events to MainWindow
+        self.queue_view.focusProxy().installEventFilter(self)
 
         self.queue_timer = QTimer()
         self.queue_timer.setSingleShot(True)
@@ -60,6 +62,14 @@ class MainWindow(QMainWindow):
         self.showing_settings = False
 
         self.show_queue()
+
+    # Required to handle key events in QWebEngineView
+    def eventFilter(self, source, event):
+        if (event.type() == QEvent.KeyPress and
+                source.parentWidget() is self.queue_view):
+            self.keyPressEvent(event)
+            return False
+        return super().eventFilter(source, event)
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -88,7 +98,7 @@ class MainWindow(QMainWindow):
         if not self.showing_settings:
             self.ui.stackedWidget.setCurrentWidget(self.ui.queue_page)
             self.queue_view.start_scroll()
-            self.queue_timer.singleShot(100000, self.show_promo)
+            self.queue_timer.singleShot(5000, self.show_promo)
             self.promo_label.load_next_image()
 
     def show_promo(self):
