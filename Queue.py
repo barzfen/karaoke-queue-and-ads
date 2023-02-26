@@ -1,5 +1,5 @@
 import requests
-from PySide6.QtCore import QUrl, QTimer, Qt
+from PySide6.QtCore import QUrl, QTimer
 from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
