@@ -88,7 +88,7 @@ class MainWindow(QMainWindow):
         if not self.showing_settings:
             self.ui.stackedWidget.setCurrentWidget(self.ui.queue_page)
             self.queue_view.start_scroll()
-            self.queue_timer.singleShot(5000, self.show_promo)
+            self.queue_timer.singleShot(100000, self.show_promo)
             self.promo_label.load_next_image()
 
     def show_promo(self):

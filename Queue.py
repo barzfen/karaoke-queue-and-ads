@@ -1,5 +1,5 @@
 import requests
-from PySide6.QtCore import QUrl, QTimer
+from PySide6.QtCore import QUrl, QTimer, Qt
 from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
@@ -37,4 +37,6 @@ class Queue(QWebEngineView):
         if self.scrolling:
             self.page().runJavaScript("window.scrollBy(0,1);")
             self.scroll_timer.singleShot(100, self.scroll_down)
-
+            height = self.page().contentsSize().height() - self.height() - 1
+            if self.page().scrollPosition().y() >= height:
+                self.page().runJavaScript("window.scrollTo(0, 0);")
