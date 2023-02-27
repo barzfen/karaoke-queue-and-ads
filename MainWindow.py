@@ -24,6 +24,12 @@ class MainWindow(QMainWindow):
         #######################
         self.settings_page = SettingsPage(self.ui.stackedWidget)
         self.ui.stackedWidget.addWidget(self.settings_page)
+
+        settings = self.settings_page.get_settings()
+        self.access_key = settings['access_key']
+        self.queue_time = settings['queue_time']
+        self.promo_time = settings['promo_time']
+
         ######################
         # Promo Widget setup #
         ######################
@@ -39,7 +45,7 @@ class MainWindow(QMainWindow):
         queue_layout = QVBoxLayout()
         queue_layout.setContentsMargins(0, 0, 0, 0)
         self.ui.queue_page.setLayout(queue_layout)
-        self.queue_view = Queue(self.ui.queue_page)
+        self.queue_view = Queue(self.ui.queue_page, self.access_key)
         queue_layout.addWidget(self.queue_view)
 
         # Redirect WebView key press events to MainWindow
@@ -98,18 +104,22 @@ class MainWindow(QMainWindow):
         if not self.showing_settings:
             self.ui.stackedWidget.setCurrentWidget(self.ui.queue_page)
             self.queue_view.start_scroll()
-            self.queue_timer.singleShot(5000, self.show_promo)
+            self.queue_timer.singleShot(self.queue_time, self.show_promo)
             self.promo_label.load_next_image()
 
     def show_promo(self):
         if not self.showing_settings:
             self.queue_view.stop_scrolling()
             self.ui.stackedWidget.setCurrentWidget(self.ui.promo_page)
-            self.promo_timer.singleShot(5000, self.show_queue)
+            self.promo_timer.singleShot(self.promo_time, self.show_queue)
             self.queue_view.refresh_site()
 
     def settings_changed(self):
         self.showing_settings = False
-        # Update of settings goes here
+
+        settings = self.settings_page.get_settings()
+        self.access_key = settings['access_key']
+        self.queue_time = settings['queue_time']
+        self.promo_time = settings['promo_time']
 
         self.show_queue()

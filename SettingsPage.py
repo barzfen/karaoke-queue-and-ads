@@ -34,6 +34,14 @@ class SettingsPage(QWidget):
         self.settings.setValue('Timing/promo', self.ui.promo_time_spinbox.value())
         self.done_signal.emit()
 
+    def get_settings(self):
+        settings = dict()
+        settings['access_key'] = self.settings.value('Access/key')
+        settings['queue_time'] = int(self.settings.value('Timing/queue')) * 1000
+        settings['promo_time'] = int(self.settings.value('Timing/promo')) * 1000
+
+        return settings
+
     def cancel_changes(self):
         self.load_values()
         self.done_signal.emit()

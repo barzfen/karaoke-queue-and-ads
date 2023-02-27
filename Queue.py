@@ -5,13 +5,13 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 
 
 class Queue(QWebEngineView):
-    def __init__(self, parent):
+    def __init__(self, parent, access_key):
         super().__init__(parent)
 
         self.setMinimumSize(1, 1)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        res = requests.get("https://connectkaraoke.com/showlogin.php?ShowDirect=MZSJFQKL")
+        res = requests.get(f"https://connectkaraoke.com/showlogin.php?ShowDirect={access_key}")
         key = res.url.split("/")[-2]
         self.proxy = f"https://connectkaraoke.com/proxy/{key}/queue"
         self.refresh_site()
