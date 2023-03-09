@@ -64,6 +64,7 @@ data = {'query': '''
         currentSinger
         songName
         stickerCode
+        includedStars
       }
     }
 '''}
