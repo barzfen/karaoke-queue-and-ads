@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
         queue_layout.addWidget(self.queue_view)
 
         # Redirect WebView key press events to MainWindow
-        self.queue_view.focusProxy().installEventFilter(self)
+        #self.queue_view.focusProxy().installEventFilter(self)
 
         self.queue_timer = QTimer()
         self.queue_timer.setSingleShot(True)
@@ -103,16 +103,16 @@ class MainWindow(QMainWindow):
     def show_queue(self):
         if not self.showing_settings:
             self.ui.stackedWidget.setCurrentWidget(self.ui.queue_page)
-            self.queue_view.start_scroll()
+
             self.queue_timer.singleShot(self.queue_time, self.show_promo)
             self.promo_label.load_next_image()
 
     def show_promo(self):
         if not self.showing_settings:
-            self.queue_view.stop_scrolling()
+
             self.ui.stackedWidget.setCurrentWidget(self.ui.promo_page)
             self.promo_timer.singleShot(self.promo_time, self.show_queue)
-            self.queue_view.refresh_site()
+            self.queue_view.refresh_list()
 
     def settings_changed(self):
         self.showing_settings = False
