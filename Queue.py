@@ -35,14 +35,14 @@ class Queue(QWidget):
         table = self.ui.queue_table
         table.clear()
         self.ui.queue_table.setColumnCount(3)
-        self.ui.queue_table.setHorizontalHeaderLabels(["Name", "Song", "Time"])
+        self.ui.queue_table.setHorizontalHeaderLabels(["Est. Time", "Name", "Song"])
         table.setRowCount(0)
         for row in queue_list:
             row_pos = table.rowCount()
             table.insertRow(row_pos)
-            table.setItem(row_pos, 0, QTableWidgetItem(row['singername']))
-            table.setItem(row_pos, 1, QTableWidgetItem(row['songname']))
-            table.setItem(row_pos, 2, QTableWidgetItem(row['estimatedtime']))
+            table.setItem(row_pos, 0, QTableWidgetItem(row['estimatedtime']))
+            table.setItem(row_pos, 1, QTableWidgetItem(row['singername']))
+            table.setItem(row_pos, 2, QTableWidgetItem(row['songname']))
         table.setAlternatingRowColors(True)
         table.setStyleSheet("alternate-background-color: lightblue; background-color: lightgrey;")
         self.refresh_timer.singleShot(self.refresh_interval, self.refresh_list)
