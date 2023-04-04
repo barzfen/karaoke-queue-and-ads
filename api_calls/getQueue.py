@@ -16,7 +16,6 @@ import xml.etree.ElementTree as ET
 
 def getQueue(proxy):
     mysecondres = requests.get(f'https://connectkaraoke.com/proxy/{proxy}/searchsongquery?mode=5')
-    print(mysecondres.content)
     root = ET.fromstring(mysecondres.content)  # parse the XML string to Element object
 
     queue_list = []
@@ -68,12 +67,8 @@ def getCurrentSinger():
 
     if response.status_code == 200:
         res = response.json()
-        return response.content
+        return response.json()
     else:
         print('Request failed with status code', response.status_code)
         return -1
 
-# usage:
-#blah = getQueue("UOHAY1SX")
-#print(blah)
-getCurrentSinger()

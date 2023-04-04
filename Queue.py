@@ -1,7 +1,7 @@
 import requests
 from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import QWidget, QTableWidgetItem, QAbstractSlider, QAbstractItemView
-from api_calls.getQueue import getQueue #, getCurrentSinger
+from PySide6.QtWidgets import QWidget, QTableWidgetItem
+from api_calls.getQueue import getQueue, getCurrentSinger
 
 from Ui_Queue import Ui_Queue
 
@@ -12,10 +12,7 @@ class Queue(QWidget):
 
         self.ui = Ui_Queue()
         self.ui.setupUi(self)
-        self.ui.queue_table.verticalHeader().setVisible(False)
-
-        #self.ui.queue_table.horizontalHeaderItem(2).setText("Song")
-        #elf.ui.queue_table.horizontalHeaderItem(3).setText("Approx Time")
+        # self.ui.queue_table.verticalHeader().setVisible(False)
 
         self.refresh_interval = 20000  # 20 seconds
         self.refresh_timer = QTimer()
@@ -32,10 +29,13 @@ class Queue(QWidget):
 
     def refresh_list(self):
         queue_list = getQueue(self.key)
-        # current_singer = getCurrentSinger()
-        # self.ui.bio.setText(f"{current_singer[0]} {current_singer[1]} {current_singer[2]}")
+        current_singer_json = getCurrentSinger()
+        data = current_singer_json['data']['getCurrentSinger']
+        self.ui.bio.setText(f"{data['stageName']}      {data['bio']}")
         table = self.ui.queue_table
         table.clear()
+        self.ui.queue_table.setColumnCount(3)
+        self.ui.queue_table.setHorizontalHeaderLabels(["Name", "Song", "Time"])
         table.setRowCount(0)
         for row in queue_list:
             row_pos = table.rowCount()
@@ -43,6 +43,8 @@ class Queue(QWidget):
             table.setItem(row_pos, 0, QTableWidgetItem(row['singername']))
             table.setItem(row_pos, 1, QTableWidgetItem(row['songname']))
             table.setItem(row_pos, 2, QTableWidgetItem(row['estimatedtime']))
+        table.setAlternatingRowColors(True)
+        table.setStyleSheet("alternate-background-color: lightblue; background-color: lightgrey;")
         self.refresh_timer.singleShot(self.refresh_interval, self.refresh_list)
 
     def start_scroll(self):
