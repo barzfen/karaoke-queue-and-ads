@@ -46,7 +46,34 @@ def getQueue(proxy):
 
     return queue_list
 
+def getCurrentSinger():
+    url = 'https://catandbarz.com/graphql'
+
+    data = {'query': '''
+                query{
+     getCurrentSinger{
+      userID
+      stageName
+      bio
+      photo
+
+    }
+
+    }
+
+            '''}
+
+    response = requests.post(url, json=data)
+
+
+    if response.status_code == 200:
+        res = response.json()
+        return response.content
+    else:
+        print('Request failed with status code', response.status_code)
+        return -1
+
 # usage:
 #blah = getQueue("UOHAY1SX")
 #print(blah)
-
+getCurrentSinger()

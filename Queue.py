@@ -46,7 +46,9 @@ class Queue(QWidget):
         self.queue_widget.clear()
 
         for song in queue_list:
+
             item = QListWidgetItem(f"{song['singername']} - {song['songname']} ({song['estimatedtime']})")
             self.queue_widget.addItem(item)
+            
 
         self.queue_widget.setCurrentRow(0)
