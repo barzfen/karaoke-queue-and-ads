@@ -33,6 +33,7 @@ class SettingsPage(QWidget):
         self.settings.setValue('Timing/queue', self.ui.queue_time_spinbox.value())
         self.settings.setValue('Timing/promo', self.ui.promo_time_spinbox.value())
         self.done_signal.emit()
+        print("applied changes")
 
     def get_settings(self):
         settings = dict()
