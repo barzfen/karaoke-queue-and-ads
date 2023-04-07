@@ -2,13 +2,10 @@ import os
 import sys
 
 def restart_app():
-    """Restarts the current program, with file objects and descriptors
-       cleanup"""
-    try:
-        p = os.popen(sys.executable + ' ' + __file__)
-        return
-    except:
-        print('Error: Could not restart program')
-        return
+    """
+    Restarts the current Python program.
+    """
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
 
 

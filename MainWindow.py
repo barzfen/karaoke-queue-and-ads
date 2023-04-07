@@ -1,3 +1,5 @@
+import cProfile
+
 from Ui_MainWindow import Ui_MainWindow
 from PySide6.QtCore import QTimer, Qt, QEvent
 from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout
@@ -52,10 +54,8 @@ class MainWindow(QMainWindow):
         #self.queue_view.focusProxy().installEventFilter(self)
 
         self.queue_timer = QTimer()
-        self.queue_timer.setSingleShot(True)
-        self.promo_timer = QTimer()
-        self.queue_timer.setSingleShot(True)
         self.queue_timer.timeout.connect(self.show_promo)
+        self.promo_timer = QTimer()
         self.promo_timer.timeout.connect(self.show_queue)
 
         self.ui.full_screen_btn.clicked.connect(self.set_fullscreen)
@@ -66,16 +66,9 @@ class MainWindow(QMainWindow):
         # Flag so that the page doesn't change with timer
         # when you switch to the settings page
         self.showing_settings = False
-
+        #cProfile.run('self.show_queue()')
+        #cProfile.runctx('self.profile_show_queue()', globals(), locals(), sort='cumulative')
         self.show_queue()
-
-    # Required to handle key events in QWebEngineView
-    def eventFilter(self, source, event):
-        if (event.type() == QEvent.KeyPress and
-                source.parentWidget() is self.queue_view):
-            self.keyPressEvent(event)
-            return False
-        return super().eventFilter(source, event)
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -104,14 +97,13 @@ class MainWindow(QMainWindow):
         if not self.showing_settings:
             self.ui.stackedWidget.setCurrentWidget(self.ui.queue_page)
 
-            self.queue_timer.singleShot(self.queue_time, self.show_promo)
+            self.queue_timer.start(self.queue_time)
             self.promo_label.load_next_image()
 
     def show_promo(self):
         if not self.showing_settings:
-
             self.ui.stackedWidget.setCurrentWidget(self.ui.promo_page)
-            self.promo_timer.singleShot(self.promo_time, self.show_queue)
+            self.promo_timer.start(self.promo_time)
             self.queue_view.refresh_list()
 
     def settings_changed(self):

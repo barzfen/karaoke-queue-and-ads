@@ -14,18 +14,18 @@ class Queue(QWidget):
         self.ui.setupUi(self)
         # self.ui.queue_table.verticalHeader().setVisible(False)
 
-        self.refresh_interval = 20000  # 20 seconds
-        self.refresh_timer = QTimer()
+        #self.refresh_interval = 20000  # 20 seconds
+        #self.refresh_timer = QTimer()
 
         res = requests.get(f"https://connectkaraoke.com/showlogin.php?ShowDirect={access_key}")
         self.key = res.url.split("/")[-2]
 
         self.scroll_timer = QTimer()
-        self.scroll_timer.timeout.connect(self.scroll_down)
+        #self.scroll_timer.timeout.connect(self.scroll_down)
         self.scrolling = False
-        self.refresh_timer.start(self.refresh_interval)
+        #self.refresh_timer.start(self.refresh_interval)
         self.refresh_list()
-        self.start_scroll()
+        #self.start_scroll()
 
     def refresh_list(self):
         queue_list = getQueue(self.key)
@@ -45,7 +45,7 @@ class Queue(QWidget):
             table.setItem(row_pos, 2, QTableWidgetItem(row['songname']))
         table.setAlternatingRowColors(True)
         table.setStyleSheet("alternate-background-color: lightblue; background-color: lightgrey;")
-        self.refresh_timer.singleShot(self.refresh_interval, self.refresh_list)
+        #self.refresh_timer.singleShot(self.refresh_interval, self.refresh_list)
 
     def start_scroll(self):
         self.scrolling = True
