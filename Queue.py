@@ -106,4 +106,4 @@ class DataUpdateThread(QThread):
             current_singer = current_singer_json['data']['getCurrentSinger']
             song_data = {"queue_list": queue_list, "current_singer": current_singer}
             self.data_retrieved.emit(song_data)
-            time.sleep(10)
+            time.sleep(15)
