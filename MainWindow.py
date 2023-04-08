@@ -67,6 +67,8 @@ class MainWindow(QMainWindow):
         self.showing_settings = False
         self.show_queue()
 
+        self.setStyleSheet("background-color: rgb(190, 168, 149)")
+
     def keyPressEvent(self, event):
         key = event.key()
         if key == Qt.Key_Escape:

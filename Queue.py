@@ -1,9 +1,10 @@
 import time
 import requests
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QPalette
 from PySide6.QtWidgets import QWidget, QTableWidgetItem
-from PySide6.QtCore import QTimer, QThread, Signal, Slot
 from api_calls.getQueue import getQueue, getCurrentSinger
+from PySide6.QtCore import Qt, QTimer, QThread, Signal, Slot
+
 
 from Ui_Queue import Ui_Queue
 
@@ -14,6 +15,9 @@ class Queue(QWidget):
 
         self.ui = Ui_Queue()
         self.ui.setupUi(self)
+        header_font = QFont("Arial", 30)
+        self.ui.queue_table.horizontalHeader().setFont(header_font)
+        self.ui.queue_table.horizontalHeader().setStyleSheet("background-color: rgb(0, 0, 0); color: white")
 
         self.top_queue_wait_time = 4000  # 4 seconds
         self.bottom_queue_wait_time = 2000  # 2 seconds
@@ -34,7 +38,12 @@ class Queue(QWidget):
     def refresh_list(self):
         self.ui.queue_table.verticalScrollBar().setValue(0)
         if len(self.current_singer) > 0:
-            self.ui.bio.setText(f"{self.current_singer['stageName']}      {self.current_singer['bio']}")
+            self.ui.banner.setText(f"Current Singer: {self.current_singer['stageName']}")
+            self.ui.bio.setText(self.current_singer['bio'])
+        singer_font = QFont('Noto Color Emoji', 30)
+        self.ui.banner.setFont(singer_font)
+        singer_font.setPointSize(20)
+        self.ui.bio.setFont(singer_font)
         table = self.ui.queue_table
         table.clear()
         self.ui.queue_table.setColumnCount(3)
@@ -47,15 +56,18 @@ class Queue(QWidget):
                 table.setItem(row_pos, 0, QTableWidgetItem(row['estimatedtime']))
                 table.setItem(row_pos, 1, QTableWidgetItem(row['singername']))
                 table.setItem(row_pos, 2, QTableWidgetItem(row['songname']))
-                fnt = QFont()
-                fnt.setPointSize(25)
+                fnt = QFont('Arial', 28)
                 for i in range(3):
                     curr_cell = table.item(row_pos, i)
                     curr_cell.setFont(fnt)
                 table.setItem(0, 0, QTableWidgetItem("NEXT"))
                 table.item(0, 0).setFont(fnt)
+            table.resizeRowsToContents()
             table.setAlternatingRowColors(True)
-            table.setStyleSheet("alternate-background-color: lightblue; background-color: lightgrey;")
+            table.setStyleSheet("""
+                alternate-background-color: rgb(192, 192, 192); background-color: rgb(222, 211, 202);
+                QTableWidget::item {border: 6px};
+            """)
             self.scroll_timer.singleShot(self.top_queue_wait_time, self.scroll_down)# Wait 2 seconds before scrolling
         else:
             print("Queue not yet loaded, trying again in 2 seconds")
@@ -74,7 +86,6 @@ class Queue(QWidget):
     def update_data(self, data):
         self.current_singer = data["current_singer"]
         self.queue_list = data["queue_list"]
-        print("Data Updated")
 
 
 class DataUpdateThread(QThread):
