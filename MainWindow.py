@@ -50,12 +50,11 @@ class MainWindow(QMainWindow):
         self.queue_view = Queue(self.ui.queue_page, self.access_key)
         queue_layout.addWidget(self.queue_view)
 
-        # Redirect WebView key press events to MainWindow
-        #self.queue_view.focusProxy().installEventFilter(self)
-
         self.queue_timer = QTimer()
-        self.queue_timer.timeout.connect(self.show_promo)
+        self.queue_timer.setSingleShot(True)
         self.promo_timer = QTimer()
+        self.queue_timer.setSingleShot(True)
+        self.queue_timer.timeout.connect(self.show_promo)
         self.promo_timer.timeout.connect(self.show_queue)
 
         self.ui.full_screen_btn.clicked.connect(self.set_fullscreen)
@@ -66,8 +65,6 @@ class MainWindow(QMainWindow):
         # Flag so that the page doesn't change with timer
         # when you switch to the settings page
         self.showing_settings = False
-        #cProfile.run('self.show_queue()')
-        #cProfile.runctx('self.profile_show_queue()', globals(), locals(), sort='cumulative')
         self.show_queue()
 
     def keyPressEvent(self, event):
@@ -103,15 +100,13 @@ class MainWindow(QMainWindow):
     def show_promo(self):
         if not self.showing_settings:
             self.ui.stackedWidget.setCurrentWidget(self.ui.promo_page)
-            self.promo_timer.start(self.promo_time)
-            self.queue_view.refresh_list()
+            self.promo_timer.singleShot(self.promo_time, self.show_queue)
 
     def settings_changed(self):
+        self.ui.stackedWidget.setCurrentWidget(self.ui.queue_page)
         self.showing_settings = False
 
         settings = self.settings_page.get_settings()
         self.access_key = settings['access_key']
         self.queue_time = settings['queue_time']
         self.promo_time = settings['promo_time']
-
-        self.show_queue()

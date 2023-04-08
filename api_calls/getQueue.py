@@ -64,7 +64,6 @@ def getCurrentSinger():
 
     response = requests.post(url, json=data)
 
-
     if response.status_code == 200:
         res = response.json()
         return response.json()
