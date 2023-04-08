@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Signal, QSettings
 from Ui_SettingsPage import Ui_SettingsPage
-from utils.RestartApp import restart_app
+
 
 
 class SettingsPage(QWidget):
@@ -34,8 +34,7 @@ class SettingsPage(QWidget):
         self.settings.setValue('Timing/queue', self.ui.queue_time_spinbox.value())
         self.settings.setValue('Timing/promo', self.ui.promo_time_spinbox.value())
         self.done_signal.emit()
-        print("applied changes")
-        restart_app()
+
 
 
     def get_settings(self):
