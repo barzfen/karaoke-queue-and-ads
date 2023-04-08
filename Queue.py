@@ -50,6 +50,7 @@ class Queue(QWidget):
         self.ui.queue_table.setHorizontalHeaderLabels(["Est. Time", "Name", "Song"])
         self.ui.queue_table.horizontalHeader().setStyleSheet("QHeaderView::section {color: white; background-color: black}")
         table.setRowCount(0)
+        table.horizontalHeader().setStretchLastSection(True)
         if len(self.queue_list) > 0:
             for row in self.queue_list:
                 row_pos = table.rowCount()
@@ -69,6 +70,9 @@ class Queue(QWidget):
                 alternate-background-color: rgb(192, 192, 192); background-color: rgb(222, 211, 202);
                 QTableWidget::item {border: 6px};
             """)
+
+            table.setColumnWidth(0, 180)
+            table.setColumnWidth(1, 400)
 
             self.scroll_timer.singleShot(self.top_queue_wait_time, self.scroll_down)# Wait 2 seconds before scrolling
         else:
