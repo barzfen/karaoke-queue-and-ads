@@ -17,7 +17,7 @@ class Queue(QWidget):
         self.ui.setupUi(self)
         header_font = QFont("Arial", 30)
         self.ui.queue_table.horizontalHeader().setFont(header_font)
-        self.ui.queue_table.horizontalHeader().setStyleSheet("background-color: rgb(0, 0, 0); color: white")
+
 
         self.top_queue_wait_time = 4000  # 4 seconds
         self.bottom_queue_wait_time = 2000  # 2 seconds
@@ -48,6 +48,7 @@ class Queue(QWidget):
         table.clear()
         self.ui.queue_table.setColumnCount(3)
         self.ui.queue_table.setHorizontalHeaderLabels(["Est. Time", "Name", "Song"])
+        self.ui.queue_table.horizontalHeader().setStyleSheet("QHeaderView::section {color: white; background-color: black}")
         table.setRowCount(0)
         if len(self.queue_list) > 0:
             for row in self.queue_list:
@@ -68,6 +69,7 @@ class Queue(QWidget):
                 alternate-background-color: rgb(192, 192, 192); background-color: rgb(222, 211, 202);
                 QTableWidget::item {border: 6px};
             """)
+
             self.scroll_timer.singleShot(self.top_queue_wait_time, self.scroll_down)# Wait 2 seconds before scrolling
         else:
             print("Queue not yet loaded, trying again in 2 seconds")
