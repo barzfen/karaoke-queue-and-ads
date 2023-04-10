@@ -14,16 +14,20 @@ class RequestHandler(BaseHTTPRequestHandler):
         if 'key' in query_params:
             # Set the value of 'Access/key' in QSettings to the value of the 'key' parameter
             settings.setValue('Access/key', query_params['key'][0])
+            settings.sync()
 
         # Check if the 'queue_time' parameter is in the query string
         if 'queue_time' in query_params:
             # Set the value of 'Timing/queue' in QSettings to the value of the 'queue_time' parameter
             settings.setValue('Timing/queue', int(query_params['queue_time'][0]))
+            settings.sync()
+
 
         # Check if the 'promo_time' parameter is in the query string
         if 'promo_time' in query_params:
             # Set the value of 'Timing/promo' in QSettings to the value of the 'promo_time' parameter
             settings.setValue('Timing/promo', int(query_params['promo_time'][0]))
+            settings.sync()
 
         # Get the values of the settings
         access_key = settings.value('Access/key')
