@@ -25,11 +25,17 @@ class RequestHandler(BaseHTTPRequestHandler):
             # Set the value of 'Timing/promo' in QSettings to the value of the 'promo_time' parameter
             settings.setValue('Timing/promo', int(query_params['promo_time'][0]))
 
-        # Send a response to the client
+        # Get the values of the settings
+        access_key = settings.value('Access/key')
+        queue_time = int(settings.value('Timing/queue'))
+        promo_time = int(settings.value('Timing/promo'))
+
+        # Send a response to the client with the values of the settings and a success message
+        response = f"Access/key: {access_key}\nTiming/queue: {queue_time}\nTiming/promo: {promo_time}\nSuccess"
         self.send_response(200)
         self.send_header('Content-type', 'text/plain')
         self.end_headers()
-        self.wfile.write(b'Success')
+        self.wfile.write(response.encode('utf-8'))
 
 # Create an HTTP server on port 8000
 server_address = ('', 8000)
