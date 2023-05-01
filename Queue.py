@@ -1,8 +1,8 @@
 import time
 import requests
-from PySide6.QtGui import QFont, QPalette
+import xml.etree.ElementTree as ET
+from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QWidget, QTableWidgetItem
-from api_calls.getQueue import getQueue, getCurrentSinger
 from PySide6.QtCore import Qt, QTimer, QThread, Signal, Slot
 
 
@@ -17,7 +17,6 @@ class Queue(QWidget):
         self.ui.setupUi(self)
         header_font = QFont("Arial", 30)
         self.ui.queue_table.horizontalHeader().setFont(header_font)
-
 
         self.top_queue_wait_time = 4000  # 4 seconds
         self.bottom_queue_wait_time = 2000  # 2 seconds
@@ -90,8 +89,11 @@ class Queue(QWidget):
 
     @Slot(dict)
     def update_data(self, data):
-        self.current_singer = data["current_singer"]
-        self.queue_list = data["queue_list"]
+        if len(data) and "current_singer" in data and "queue_list" in data:
+            self.current_singer = data["current_singer"]
+            self.queue_list = data["queue_list"]
+        else:
+            print("Update data called but invalid data provided, so update aborted")
 
 
 class DataUpdateThread(QThread):
@@ -103,13 +105,100 @@ class DataUpdateThread(QThread):
         self.key = ""
 
     def run(self):
-        res = requests.get(f"https://connectkaraoke.com/showlogin.php?ShowDirect={self.access_key}")
-        self.key = res.url.split("/")[-2]
+        have_key = False
+        while not have_key:
+            try:
+                res = requests.get(f"https://connectkaraoke.com/showlogin.php?ShowDirect={self.access_key}")
+                have_key = res.ok
+                self.key = res.url.split("/")[-2]
+            except requests.exceptions.Timeout:
+                print("Time out.")
+            except requests.exceptions.ConnectionError:
+                print("Could not establish a connection, check network connectivity.")
+            except requests.exceptions.RequestException as e:
+                print(f"Request Error encountered: {e}")
+            finally:
+                if not have_key:
+                    time.sleep(2)
 
         while True:
-            queue_list = getQueue(self.key)
-            current_singer_json = getCurrentSinger()
-            current_singer = current_singer_json['data']['getCurrentSinger']
-            song_data = {"queue_list": queue_list, "current_singer": current_singer}
-            self.data_retrieved.emit(song_data)
+            queue_list = self.get_queue()
+            current_singer_data = self.get_current_singer()
+            if len(queue_list) and \
+                    len(current_singer_data) and \
+                    'data' in current_singer_data and \
+                    'getCurrentSinger' in current_singer_data['data']:
+                current_singer = current_singer_data['data']['getCurrentSinger']
+                song_data = {"queue_list": queue_list, "current_singer": current_singer}
+                self.data_retrieved.emit(song_data)
+            else:
+                print("Unsuccessful in retrieving queue or current singer data")
             time.sleep(15)
+
+    def get_queue(self):
+        try:
+            mysecondres = requests.get(f'https://connectkaraoke.com/proxy/{self.key}/searchsongquery?mode=5')
+        except requests.exceptions.Timeout:
+            print("Get Queue time out.")
+            return []
+        except requests.exceptions.ConnectionError:
+            print("Could not establish a connection, check network connectivity.")
+            return []
+        except requests.exceptions.RequestException as e:
+            print(f"Get Queue Request Error encountered: {e}")
+            return []
+
+        root = ET.fromstring(mysecondres.content)  # parse the XML string to Element object
+
+        queue_list = []
+
+        for i, song in enumerate(root.findall('song')):
+            singername = song.find('singername').text
+            songid = song.find('songid').text
+            songname = song.find('songname').text
+            time = song.find('time').text
+            canedit = song.find('canedit').text
+            canmoveup = song.find('canmoveup').text
+            canmovedown = song.find('canmovedown').text
+
+            song_dict = {
+                "index": i,
+                "singername": singername,
+                "siglosid": songid,
+                "songname": songname,
+                "estimatedtime": time,
+                "canedit": canedit,
+                "canmoveup": canmoveup,
+                "canmovedown": canmovedown
+            }
+
+            queue_list.append(song_dict)
+
+        return queue_list
+
+    @staticmethod
+    def get_current_singer():
+        url = 'https://catandbarz.com/graphql'
+
+        data = {'query': '''
+                    query{
+         getCurrentSinger{
+          userID
+          stageName
+          bio
+          photo
+    
+        }
+    
+        }
+    
+                '''}
+
+        response = requests.post(url, json=data)
+
+        if response.status_code == 200:
+            res = response.json()
+            return res
+        else:
+            print('Request failed with status code', response.status_code)
+            return {}
